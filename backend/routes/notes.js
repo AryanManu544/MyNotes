@@ -5,14 +5,18 @@ var fetchuser = require("../middleware/fetchuser")
 const {body,validationResult } = require("express-validator")
 
 //Route 1: Get all the notes using GET: "/api/auth/fetchallnotes". Login required
-router.get('/fetchallnotes', fetchuser, async (req,res) => {
+router.get('/fetchallnotes', fetchuser, async (req, res) => {
   try {
-    const notes = await Note.find({user: req.user.id})
-    res.json(notes)
-  } catch {
-    res.status(500).json({ error: 'Server error' })
+    console.log("Fetching notes for user:", req.user.id);  // ✅ Step 1: Log when the request reaches
+    const notes = await Note.find({ user: req.user.id });
+    console.log("Notes retrieved:", notes);  // ✅ Step 2: Log if notes are found
+    res.json(notes);
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+    res.status(500).json({ error: "Server error" });
   }
-})
+});
+
 //Route 2: Add the notes using: POST "/api/auth/addnote". Login required
 router.post('/addnote', fetchuser, [
   body('title', 'Enter a valid title').isLength({ min: 3 }),
@@ -82,30 +86,26 @@ router.put('/updatenote/:id', fetchuser, async (req, res) => {
 // Route 4: Delete the notes using: PUT "/api/auth/deletenote/:id". Login required
 router.delete('/deletenote/:id', fetchuser, async (req, res) => {
   try {
-    // Find the note by ID
-    let note = await Note.findById(req.params.id); // Add 'await' here
-
-    // If the note doesn't exist
+    const note = await Note.findById(req.params.id);
     if (!note) {
-      return res.status(404).send("Note not found");
+      return res.status(404).json({ error: "Note not found" }); // Early return if note is not found
     }
 
-    // Ensure the user owns the note
+    // Check if the note belongs to the logged-in user
     if (note.user.toString() !== req.user.id) {
-      return res.status(401).send("Not allowed");
+      return res.status(401).json({ error: "Not authorized" }); // Early return if not authorized
     }
 
     // Delete the note
-    note = await Note.findByIdAndDelete(
-      req.params.id,
-      res.json({"Success": "Note has been deleted", note:note})
-    );
+    await Note.findByIdAndDelete(req.params.id);
 
-    res.json({ note });
+    // Only send the response once
+    return res.json({ success: "Note deleted successfully" });
   } catch (error) {
-    console.error("Error updating note:", error);
-    res.status(500).send("Internal Server Error");
+    console.error(error.message);
+    return res.status(500).send("Server Error");
   }
 });
+
 
 module.exports = router
