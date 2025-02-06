@@ -48,6 +48,7 @@ router.post('/login', [
   body('email', "Enter a valid Email").isEmail(),
   body('password', 'Password cannot be blank').exists(),
 ], async (req, res) => {
+  let success = false
   console.log("Request received:", req.body); // Log incoming request
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -61,15 +62,17 @@ router.post('/login', [
     // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
+      success = false 
       console.log(`User with email ${email} not found`); // Log missing user
-      return res.status(400).json({ error: "Sorry, the user doesn't exist" });
+      return res.status(400).json({success, error: "Sorry, the user doesn't exist" });
     }
 
     // Compare passwords
     const passwordcompare = await bcrypt.compare(password, user.password);
     if (!passwordcompare) {
+      success = false 
       console.log("Password mismatch for user:", email); // Log password mismatch
-      return res.status(400).json({ error: "Password is incorrect" });
+      return res.status(400).json({ success, error: "Password is incorrect" });
     }
 
     // Generate JWT
@@ -80,7 +83,8 @@ router.post('/login', [
     };
     const authtoken = jwt.sign(data, JWT_SECRET);
     console.log("Login successful, token generated"); // Log success
-    res.json({ authtoken });
+    success = true 
+    res.json({success, authtoken });
   } catch (error) {
     console.error("Error during login:", error); // Log unexpected errors
     res.status(500).send("Internal server error");
