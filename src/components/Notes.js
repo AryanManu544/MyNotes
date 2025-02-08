@@ -8,6 +8,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 const Notes = (props) => {
     const context = useContext(noteContext);
     const { notes, fetchNotes, editnote } = context;
+    const { mode } = props;
 
     const [note, setNote] = useState({ id: "", etitle: "", edescription: "", etag: "" });
 
@@ -29,8 +30,7 @@ const Notes = (props) => {
 
     const handleSaveChanges = async () => {
         await editnote(note.id, note.etitle, note.edescription, note.etag);
-        props.showalert("Updated successfully", "success")
-        // Close the modal
+        props.showalert("Updated successfully", "success");
         if (window.bootstrap) {
             const modal = window.bootstrap.Modal.getInstance(ref.current);
             modal.hide();
@@ -39,11 +39,10 @@ const Notes = (props) => {
 
     return (
         <>
-            <AddNotes showalert = {props.showalert}/>
-            
+            <AddNotes showalert={props.showalert} mode={mode} />
             <div className="modal fade" id="editModal" tabIndex="-1" ref={ref} aria-hidden="true">
                 <div className="modal-dialog">
-                    <div className="modal-content">
+                    <div className="modal-content" style={{ backgroundColor: mode === "dark" ? "#1e1e1e" : "white", color: mode === "dark" ? "white" : "black" }}>
                         <div className="modal-header">
                             <h5 className="modal-title">Edit Note</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -52,37 +51,47 @@ const Notes = (props) => {
                             <form>
                                 <div className="mb-3">
                                     <label htmlFor="etitle" className="form-label">Title</label>
-                                    <input type="text" className="form-control" id="etitle" value={note.etitle} onChange={(e) => setNote({ ...note, etitle: e.target.value })} />
+                                    <input type="text" className="form-control" id="etitle" value={note.etitle} onChange={(e) => setNote({ ...note, etitle: e.target.value })} style={{
+                                        backgroundColor: mode === "dark" ? "#333" : "white",
+                                        color: mode === "dark" ? "white" : "black",
+                                        border: "1px solid #666"
+                                    }} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="edescription" className="form-label">Description</label>
-                                    <textarea className="form-control" id="edescription" rows="3" value={note.edescription} onChange={(e) => setNote({ ...note, edescription: e.target.value })}></textarea>
+                                    <label htmlFor="edescription" className="form-label" >Description</label>
+                                    <textarea className="form-control" id="edescription" rows="3" value={note.edescription} onChange={(e) => setNote({ ...note, edescription: e.target.value })} style={{
+                                        backgroundColor: mode === "dark" ? "#333" : "white",
+                                        color: mode === "dark" ? "white" : "black",
+                                        border: "1px solid #666"
+                                    }} ></textarea>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="etag" className="form-label">Tag</label>
-                                    <input type="text" className="form-control" id="etag" value={note.etag} onChange={(e) => setNote({ ...note, etag: e.target.value })} />
+                                    <input type="text" className="form-control" id="etag" value={note.etag} onChange={(e) => setNote({ ...note, etag: e.target.value })} style={{
+                                        backgroundColor: mode === "dark" ? "#333" : "white",
+                                        color: mode === "dark" ? "white" : "black",
+                                        border: "1px solid #666"
+                                    }} />
                                 </div>
                             </form>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary" onClick={handleSaveChanges} >Save changes</button>
+                            <button type="button" className="btn btn-primary" onClick={handleSaveChanges}>Save changes</button>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div className="row my-3">
                 <h2>Your notes</h2>
                 <div className="container mx-1">
-                {notes.length===0 && "No notes to display"}
+                    {notes.length === 0 && "No notes to display"}
                 </div>
                 {notes.map((note) => {
-                    return <Noteitem key={note._id} updateNote={handleUpdateNote} showalert= {props.showalert} note={note} />;
+                    return <Noteitem key={note._id} updateNote={handleUpdateNote} showalert={props.showalert} note={note} mode={mode} />;
                 })}
             </div>
         </>
     );
 };
-
 export default Notes;

@@ -1,25 +1,26 @@
-import React, {useContext} from "react"
+import React, { useContext } from "react";
 import noteContext from "../context/notes/NoteContext";
 
 const Noteitem = (props) => {
-    const context = useContext(noteContext)
-    const {deletenote} = context
-    const { note,updateNote } = props
+    const context = useContext(noteContext);
+    const { deletenote } = context;
+    const { note, updateNote, mode } = props;
     return (
         <div className="col-md-3">
-            <div className="card my-3">
+            <div className="card my-3" style={{ backgroundColor: mode === "dark" ? "#1e1e1e" : "white", color: mode === "dark" ? "white" : "black" }}>
                 <div className="card-body">
                     <div className="d-flex">
-                    <h5 className="card-title">{note.title}</h5>
-                    <i className="fa-solid fa-trash-can my-1 mx-2" onClick={() => {deletenote(note._id);        
-                    props.showalert("Deleted successfully", "success")
-}}></i>
-                    <i className="fa-regular fa-pen-to-square my-1 mx-2" onClick={() => {updateNote(note)}}></i>
+                        <h5 className="card-title">{note.title}</h5>
+                        <i className="fa-solid fa-trash-can my-1 mx-2" onClick={() => {
+                            deletenote(note._id);
+                            props.showalert("Deleted successfully", "success");
+                        }}></i>
+                        <i className="fa-regular fa-pen-to-square my-1 mx-2" onClick={() => { updateNote(note); }}></i>
                     </div>
                     <p className="card-text">{note.description}</p>
                 </div>
             </div>
         </div>
-    )
-}
-export default Noteitem
+    );
+};
+export default Noteitem;
