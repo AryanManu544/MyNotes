@@ -8,7 +8,8 @@ import { Alert } from "./components/Alert";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import { useState, useEffect } from "react";
-import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute"; 
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const [alert, setalert] = useState({});
@@ -49,6 +50,7 @@ function App() {
           <Route path="/login" element={<Login mode = {mode} showalert={showalert} />} />
           <Route path="/signup" element={<Signup mode={mode} showalert={showalert} />} />
         </Routes>
+        <Analytics />
       </div>
     </NoteState>
   );
