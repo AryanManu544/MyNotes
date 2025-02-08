@@ -5,7 +5,7 @@ import AddNotes from "./AddNotes";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
-const Notes = () => {
+const Notes = (props) => {
     const context = useContext(noteContext);
     const { notes, fetchNotes, editnote } = context;
 
@@ -19,7 +19,6 @@ const Notes = () => {
 
     const handleUpdateNote = (currentNote) => {
         setNote({ id: currentNote._id, etitle: currentNote.title, edescription: currentNote.description, etag: currentNote.tag });
-
         if (window.bootstrap) {
             const modal = new window.bootstrap.Modal(ref.current);
             modal.show();
@@ -30,7 +29,7 @@ const Notes = () => {
 
     const handleSaveChanges = async () => {
         await editnote(note.id, note.etitle, note.edescription, note.etag);
-
+        props.showalert("Updated successfully", "success")
         // Close the modal
         if (window.bootstrap) {
             const modal = window.bootstrap.Modal.getInstance(ref.current);
@@ -40,7 +39,7 @@ const Notes = () => {
 
     return (
         <>
-            <AddNotes />
+            <AddNotes showalert = {props.showalert}/>
             
             <div className="modal fade" id="editModal" tabIndex="-1" ref={ref} aria-hidden="true">
                 <div className="modal-dialog">
@@ -67,7 +66,7 @@ const Notes = () => {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary" onClick={handleSaveChanges}>Save changes</button>
+                            <button type="button" className="btn btn-primary" onClick={handleSaveChanges} >Save changes</button>
                         </div>
                     </div>
                 </div>
@@ -79,7 +78,7 @@ const Notes = () => {
                 {notes.length===0 && "No notes to display"}
                 </div>
                 {notes.map((note) => {
-                    return <Noteitem key={note._id} updateNote={handleUpdateNote} note={note} />;
+                    return <Noteitem key={note._id} updateNote={handleUpdateNote} showalert= {props.showalert} note={note} />;
                 })}
             </div>
         </>
